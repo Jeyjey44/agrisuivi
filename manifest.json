@@ -1,0 +1,17 @@
+{
+  "name": "AgriSuivi",
+  "short_name": "AgriSuivi",
+  "description": "Gestion des interventions agricoles",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f7f9f4",
+  "theme_color": "#3B6D11",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
