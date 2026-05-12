@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="AgriSuivi">
+<meta name="theme-color" content="#3B6D11">
+<title>AgriSuivi 2.0</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{
+  --green-dark:#27500A;--green:#3B6D11;--green-mid:#639922;--green-light:#EAF3DE;--green-pale:#f4faea;
+  --amber:#854F0B;--amber-light:#FAEEDA;--teal:#0F6E56;--teal-light:#E1F5EE;
+  --blue:#185FA5;--blue-light:#E6F1FB;--coral:#993C1D;--coral-light:#FAECE7;
+  --pink:#993556;--pink-light:#FBEAF0;--gray:#5F5E5A;--gray-light:#F1EFE8;
+  --red:#A32D2D;--red-light:#FCEBEB;--purple:#534AB7;--purple-light:#EEEDFE;
+  --bg:#f7f9f4;--surface:#ffffff;--border:rgba(0,0,0,0.10);--border-mid:rgba(0,0,0,0.18);
+  --text:#1a1f15;--text-muted:#5a6352;--text-faint:#92998a;
+  --radius:10px;--radius-lg:14px;--shadow:0 1px 4px rgba(0,0,0,0.08);
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#161b10;--surface:#1f2719;--border:rgba(255,255,255,0.10);--border-mid:rgba(255,255,255,0.18);
+  --text:#e8f0e0;--text-muted:#9aaa8a;--text-faint:#5a6a4a;
+  --green-light:#1a2e0a;--green-pale:#141f0c;--amber-light:#2a1f08;--teal-light:#0a1f18;
+  --blue-light:#0a1828;--coral-light:#2a100a;--pink-light:#2a0f18;--gray-light:#1a1f15;
+  --red-light:#2a0a0a;--purple-light:#1a1830;--green:#5a9a1f;--green-mid:#78b830;
+}}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);font-size:15px;height:100%;display:flex;flex-direction:column;overflow:hidden}
+.header{background:var(--green);color:#fff;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+.header-inner{display:flex;align-items:center;gap:10px;padding:12px 16px}
+.header-logo{width:32px;height:32px;background:rgba(255,255,255,0.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.header-title{font-size:17px;font-weight:600}.header-sub{font-size:11px;opacity:.75;margin-top:1px}
+.header-sync{margin-left:auto;background:rgba(255,255,255,0.15);border:none;color:#fff;padding:6px 10px;border-radius:8px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;flex-shrink:0}
+.header-sync:active{background:rgba(255,255,255,0.25)}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:#6effa0;flex-shrink:0}
+.sync-dot.off{background:#ffb347}.sync-dot.error{background:#ff6b6b}
+.sync-dot.syncing{animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.nav{background:var(--surface);border-top:0.5px solid var(--border);display:flex;flex-shrink:0;flex-direction:row}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:7px 2px 9px;gap:3px;border:none;background:none;color:var(--text-faint);font-size:9px;cursor:pointer;transition:color .15s;letter-spacing:.01em}
+.nav-item svg{width:21px;height:21px;stroke-width:1.7}.nav-item.active{color:var(--green)}.nav-item.active svg{stroke-width:2.2}
+.content{flex:1;overflow-y:auto;overflow-x:hidden;min-height:0}
+.page{display:none;padding:16px;padding-bottom:28px;max-width:680px;margin:0 auto}.page.active{display:block}
+.card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.card-title{font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+label:not(.interv-cout-row){display:block;font-size:12px;color:var(--text-muted);margin-bottom:5px;margin-top:12px;font-weight:500}
+label:first-child{margin-top:0}
+input,select,textarea{width:100%;padding:10px 12px;border:0.5px solid var(--border-mid);border-radius:var(--radius);font-size:15px;background:var(--surface);color:var(--text);font-family:inherit;appearance:none;-webkit-appearance:none;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green)}
+textarea{resize:vertical;min-height:70px;line-height:1.5}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border:0.5px solid var(--border-mid);border-radius:var(--radius);font-size:14px;font-weight:500;cursor:pointer;background:var(--surface);color:var(--text);font-family:inherit;transition:all .15s;-webkit-user-select:none;user-select:none}
+.btn:active{transform:scale(.97)}.btn-primary{background:var(--green);color:#fff;border-color:var(--green)}.btn-primary:active{background:var(--green-dark)}
+.btn-danger{color:var(--red);border-color:var(--red-light)}.btn-danger:active{background:var(--red-light)}
+.btn-purple{background:var(--purple);color:#fff;border-color:var(--purple)}.btn-purple:active{background:#3C3489}
+.btn-sm{padding:6px 12px;font-size:13px}.btn-block{width:100%;margin-top:14px}.btn-icon{padding:8px;border-radius:var(--radius);border:0.5px solid var(--border)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.stat{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:12px 8px;text-align:center;box-shadow:var(--shadow)}
+.stat-n{font-size:22px;font-weight:700;color:var(--green);line-height:1}.stat-l{font-size:11px;color:var(--text-muted);margin-top:4px}
+.list-item{padding:12px 0;border-bottom:0.5px solid var(--border);display:flex;align-items:flex-start;gap:10px}
+.list-item:last-child{border-bottom:none}.li-body{flex:1;min-width:0}
+.li-title{font-size:14px;font-weight:500;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li-sub{font-size:12px;color:var(--text-muted);line-height:1.5}
+.li-comment{font-size:12px;color:var(--text-faint);font-style:italic;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip{display:inline-block;padding:2px 7px;border-radius:20px;font-size:11px;font-weight:600;flex-shrink:0}
+.chip-ts{background:var(--amber-light);color:var(--amber)}.chip-ro{background:var(--gray-light);color:var(--gray)}
+.chip-se{background:var(--green-light);color:var(--green-dark)}.chip-fe{background:var(--teal-light);color:var(--teal)}
+.chip-pu{background:var(--blue-light);color:var(--blue)}.chip-re{background:var(--coral-light);color:var(--coral)}
+.chip-ff{background:var(--green-light);color:var(--green-dark)}.chip-fa{background:var(--pink-light);color:var(--pink)}
+.chip-br{background:#F1EFE8;color:#444441}
+.empty{text-align:center;padding:32px 16px;color:var(--text-faint)}
+.empty-icon{font-size:40px;margin-bottom:8px}.empty-text{font-size:14px}
+.filters{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.filters input,.filters select{font-size:13px;padding:8px 10px}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.section-head h2{font-size:15px;font-weight:600}
+.export-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.page-title{font-size:20px;font-weight:700;margin-bottom:16px}
+.toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(20px);background:#222;color:#fff;padding:10px 18px;border-radius:24px;font-size:13px;opacity:0;transition:all .3s;pointer-events:none;z-index:300;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.p-badge{display:inline-flex;align-items:center;gap:4px;background:var(--green-light);color:var(--green-dark);padding:3px 8px;border-radius:20px;font-size:12px;font-weight:500}
+.install-banner{background:var(--green-light);border:0.5px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--green-dark)}
+.install-banner button{margin-left:auto;background:var(--green);color:#fff;border:none;padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer;flex-shrink:0}
+.sync-status-bar{background:var(--green-light);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 12px;margin-bottom:12px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--green-dark)}
+.sync-status-bar.error{background:var(--red-light);color:var(--red)}.sync-status-bar.warning{background:var(--amber-light);color:var(--amber)}
+
+/* COUTS SPECIFIQUES */
+.cout-result-box{background:var(--purple-light);border:0.5px solid var(--purple);border-radius:var(--radius-lg);padding:16px;margin-bottom:12px}
+.cout-big{font-size:32px;font-weight:700;color:var(--purple)}
+.cout-label{font-size:13px;color:var(--text-muted);margin-top:2px}
+.cout-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.cout-mini{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 12px;text-align:center}
+.cout-mini-n{font-size:18px;font-weight:700;color:var(--text)}
+.cout-mini-l{font-size:11px;color:var(--text-muted);margin-top:2px}
+.interv-cout-row{padding:10px 0;border-bottom:0.5px solid var(--border);display:flex;align-items:flex-start;gap:8px;cursor:pointer;transition:opacity .2s}
+.interv-cout-row:last-child{border-bottom:none}
+.toggle-check{width:20px;height:20px;flex-shrink:0;margin-top:2px;cursor:pointer;accent-color:var(--green)}
+.intrant-row{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:8px}
+.intrant-row input{font-size:13px;padding:7px 9px}
+.intrant-row select{font-size:13px;padding:7px 9px}
+.cout-detail-table{width:100%;font-size:13px;border-collapse:collapse}
+.cout-detail-table td{padding:5px 0;border-bottom:0.5px solid var(--border)}
+.cout-detail-table tr:last-child td{border-bottom:none;font-weight:600}
+.badge-modif{display:inline-block;background:var(--amber-light);color:var(--amber);font-size:10px;padding:1px 6px;border-radius:10px;margin-left:4px}
+.tarif-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.tarif-row label{margin:0;flex:1;font-size:13px}
+.tarif-row input{width:90px;flex-shrink:0;font-size:13px;padding:6px 8px;text-align:right}
+.bilan-row{padding:12px 0;border-bottom:0.5px solid var(--border);display:flex;align-items:flex-start;gap:10px}
+.bilan-row:last-child{border-bottom:none}
+.bilan-nom{font-size:14px;font-weight:600;margin-bottom:3px}
+.bilan-meta{font-size:12px;color:var(--text-muted)}
+.bilan-montant{font-size:15px;font-weight:700;color:var(--purple);flex-shrink:0;text-align:right}
+.bilan-detail{background:var(--purple-light);border-radius:var(--radius);padding:12px;margin-top:10px;display:none}
+.bilan-detail.open{display:block}
+/* MODAL EDIT PARCELLE */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.open{display:flex}
+.modal-box{background:var(--surface);border-radius:var(--radius-lg);padding:20px;width:100%;max-width:360px;box-shadow:0 8px 32px rgba(0,0,0,0.2)}
+.modal-title{font-size:16px;font-weight:600;margin-bottom:14px}
+/* CAMEMBERT */
+.pie-wrap{display:flex;flex-direction:column;align-items:center;margin:8px 0 12px}
+/* HISTORIQUE INLINE SAISIE */
+.mini-hist{margin-top:10px;border-top:0.5px solid var(--border);padding-top:10px}
+.mini-hist-title{font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+/* COUT PARCELLES SELECT */
+.cout-parcelle-line{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.cout-parcelle-line select{flex:1}
+
+.asso-bar-wrap{margin:4px 0 10px;height:18px;border-radius:9px;overflow:hidden;display:flex;background:var(--bg)}
+.asso-bar-seg{height:100%;transition:width .4s;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:rgba(255,255,255,0.92);overflow:hidden;white-space:nowrap}
+.asso-legend{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.asso-legend-item{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--text-muted)}
+.asso-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.asso-year-head{font-size:13px;font-weight:600;color:var(--text-muted);margin:14px 0 6px;text-transform:uppercase;letter-spacing:.05em}
+.asso-parcelle-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--border);font-size:13px}
+.asso-parcelle-row:last-child{border-bottom:none}
+.asso-parcelle-name{min-width:110px;font-weight:500;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.asso-culture-badge{padding:2px 8px;border-radius:12px;font-size:12px;font-weight:500;white-space:nowrap}
+.asso-tabs{display:flex;gap:4px;border-bottom:0.5px solid var(--border);margin-bottom:14px}
+.asso-tab{padding:7px 14px;font-size:13px;cursor:pointer;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.asso-tab.active{color:var(--text);border-bottom-color:var(--text);font-weight:500}
+.asso-saisie-grid{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;margin-bottom:8px}
+.asso-saisie-grid input,.asso-saisie-grid select{font-size:13px;padding:7px 9px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-logo">🌾</div>
+    <div><div class="header-title">AgriSuivi</div><div class="header-sub">v2.0</div></div>
+    <button class="header-sync" onclick="showPage('parametres')">
+      <div class="sync-dot off" id="sync-dot"></div>
+      <span id="sync-label">Kdrive</span>
+    </button>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div id="install-banner" class="install-banner" style="display:none">
+      📲 <span>Installer AgriSuivi sur cet appareil ?</span>
+      <button onclick="installApp()">Installer</button>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div class="section-head"><h2>Dernières interventions</h2></div>
+    <div class="card" id="recent-list"></div>
+  </div>
+
+  <!-- PARCELLES -->
+  <div class="page" id="page-parcelles">
+    <div class="page-title">Mes parcelles</div>
+    <div class="card">
+      <div class="card-title">Ajouter une parcelle</div>
+      <label>Nom de la parcelle</label>
+      <input id="p-nom" placeholder="ex : Le Grand Champ" autocomplete="off">
+      <div class="row2" style="margin-top:10px">
+        <div><label>Superficie (ha)</label><input id="p-sup" type="number" step="0.01" min="0" placeholder="ex : 4.5"></div>
+        <div><label>Culture principale</label><input id="p-culture" placeholder="ex : Blé" autocomplete="off"></div>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="addParcelle()">＋ Ajouter la parcelle</button>
+    </div>
+    <div id="parcelles-list"></div>
+  </div>
+
+  <!-- SAISIE -->
+  <div class="page" id="page-saisie">
+    <div class="page-title">Nouvelle intervention</div>
+    <div class="card">
+      <label>Parcelle(s) *</label>
+      <div id="i-parcelles-wrap"></div>
+      <button class="btn btn-sm" onclick="addParcelleSelect()" style="margin-top:6px">＋ Ajouter une parcelle</button>
+      <label>Type d'intervention *</label>
+      <select id="i-type" onchange="updateSousTypes()"><option value="">— Choisir —</option></select>
+      <div id="sous-type-wrap" style="display:none">
+        <label>Sous-type</label><select id="i-soustype"></select>
+      </div>
+      <label>Date *</label><input id="i-date" type="date">
+      <div class="row2" style="margin-top:10px">
+        <div><label>Temps passé (h)</label><input id="i-temps" type="number" step="0.25" min="0" placeholder="ex : 2.5"></div>
+        <div id="i-materiel-wrap">
+          <label id="i-materiel-label">Matériel / Produit</label>
+          <input id="i-materiel" placeholder="optionnel" autocomplete="off" list="i-materiel-datalist">
+          <datalist id="i-materiel-datalist"></datalist>
+          <div id="i-culture-wrap" style="display:none">
+            <select id="i-culture-select" onchange="onCultureSelectChange()"></select>
+            <input id="i-culture-custom" placeholder="Saisir une culture..." autocomplete="off" style="display:none;margin-top:6px">
+          </div>
+        </div>
+      </div>
+      <label>Commentaire</label>
+      <textarea id="i-comment" placeholder="Dose, conditions météo, observations..."></textarea>
+      <button class="btn btn-primary btn-block" onclick="addIntervention()">💾 Enregistrer l'intervention</button>
+    </div>
+    <!-- Historique inline de la parcelle sélectionnée -->
+    <div id="saisie-mini-hist" style="display:none">
+      <div class="mini-hist-title">Dernières interventions sur cette parcelle</div>
+      <div class="card" style="padding:8px 12px" id="saisie-mini-hist-list"></div>
+    </div>
+  </div>
+
+  <!-- HISTORIQUE -->
+  <div class="page" id="page-historique">
+    <div class="page-title">Historique</div>
+    <div class="filters">
+      <select id="f-parcelle" onchange="renderHistorique()"><option value="">Toutes parcelles</option></select>
+      <select id="f-type" onchange="renderHistorique()"><option value="">Tous types</option></select>
+      <input id="f-debut" type="date" onchange="renderHistorique()" title="Date début">
+      <input id="f-fin" type="date" onchange="renderHistorique()" title="Date fin">
+    </div>
+    <div class="export-row">
+      <button class="btn btn-sm" onclick="exportCSV()">📊 Export LibreOffice (.csv)</button>
+      <button class="btn btn-sm" onclick="exportJSON()">💾 Sauvegarde JSON</button>
+    </div>
+    <div id="historique-list"></div>
+  </div>
+
+  <!-- COUTS -->
+  <div class="page" id="page-couts">
+    <div class="page-title">Calcul des coûts</div>
+
+    <!-- TABS COUTS -->
+    <div style="display:flex;gap:4px;border-bottom:0.5px solid var(--border);margin-bottom:16px">
+      <button class="tab-cout active" id="tcout-new" onclick="switchCoutTab('new')" style="padding:7px 14px;font-size:13px;cursor:pointer;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-1px">💶 Nouveau calcul</button>
+      <button class="tab-cout" id="tcout-hist" onclick="switchCoutTab('hist')" style="padding:7px 14px;font-size:13px;cursor:pointer;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-1px">📁 Bilans enregistrés</button>
+    </div>
+
+    <!-- PANEL NOUVEAU CALCUL -->
+    <div id="cout-panel-new">
+
+    <!-- STEP 1: FILTRES -->
+    <div class="card" id="cout-step1">
+      <div class="card-title">1. Sélection de la période et des parcelles</div>
+      <label>Nom du calcul</label>
+      <input id="c-nom" placeholder="ex : Campagne blé 2025 – Parcelle Nord" autocomplete="off">
+      <div class="row2" style="margin-top:10px">
+        <div><label>Date de début</label><input id="c-debut" type="date"></div>
+        <div><label>Date de fin</label><input id="c-fin" type="date"></div>
+      </div>
+      <label>Parcelles</label>
+      <div id="cout-parcelles-selects"></div>
+      <button class="btn btn-sm" onclick="addCoutParcelle()" style="margin-top:4px">＋ Ajouter une parcelle</button>
+      <label style="margin-top:12px">Type d'intervention</label>
+      <select id="c-type"><option value="">Tous les types</option></select>
+      <button class="btn btn-primary btn-block" onclick="chargerInterventionsCout()">→ Étape suivante</button>
+    </div>
+
+    <!-- STEP 2: TARIFS -->
+    <div class="card" id="cout-step2" style="display:none">
+      <div class="card-title">2. Tarifs de base <span class="badge-modif">modifiables</span></div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Source : Barème d'entraide CUMA / Chambres d'agriculture 2024-2025. Modifiables et sauvegardés dans vos réglages.</div>
+      <div class="tarif-row"><label>🧑‍🌾 Chauffeur (€/h)</label><input type="number" id="t-chauffeur" step="0.5" min="0"></div>
+      <div class="tarif-row"><label>🚜 Tracteur (€/h, hors chauffeur)</label><input type="number" id="t-tracteur" step="0.5" min="0"></div>
+      <div style="border-top:0.5px solid var(--border);margin:10px 0;padding-top:10px">
+        <div style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Coût matériel par type (€/ha, tracteur + chauffeur non inclus)</div>
+        <div id="tarifs-materiel"></div>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="goStep3()">→ Valider les tarifs</button>
+    </div>
+
+    <!-- STEP 3: INTERVENTIONS + INTRANTS -->
+    <div id="cout-step3" style="display:none">
+      <div class="card">
+        <div class="card-title">3. Interventions incluses dans le calcul</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Cochez/décochez les interventions à inclure. MO + tracteur calculés sur le temps saisi, matériel sur la superficie de la parcelle.</div>
+        <div id="cout-interventions-list"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">4. Intrants éventuels</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Semences, engrais, produits phytos... Saisir la dose/ha ou le coût total.</div>
+        <div id="intrants-list"></div>
+        <button class="btn btn-sm" onclick="addIntrant()" style="margin-top:6px">＋ Ajouter un intrant</button>
+      </div>
+      <button class="btn btn-purple btn-block" onclick="calculerCout()" style="margin-bottom:12px">💶 Calculer le coût total</button>
+    </div>
+
+    <!-- STEP 4: RESULTAT -->
+    <div id="cout-resultat" style="display:none">
+      <div class="cout-result-box">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+          <div>
+            <div class="cout-label" id="res-nom-label" style="font-weight:600;font-size:14px;color:var(--purple)"></div>
+            <div class="cout-label">Coût total estimé</div>
+            <div class="cout-big" id="res-total">—</div>
+          </div>
+        </div>
+        <div class="cout-grid">
+          <div class="cout-mini"><div class="cout-mini-n" id="res-ha">—</div><div class="cout-mini-l">€ / ha</div></div>
+          <div class="cout-mini"><div class="cout-mini-n" id="res-surface">—</div><div class="cout-mini-l">ha calculés</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Détail du calcul</div>
+        <table class="cout-detail-table" id="cout-detail-table"></table>
+      </div>
+      <div class="export-row">
+        <button class="btn btn-sm btn-purple" onclick="enregistrerBilan()">💾 Enregistrer ce bilan</button>
+        <button class="btn btn-sm" onclick="exportCoutCSV()">📊 Exporter (.csv)</button>
+        <button class="btn btn-sm" onclick="resetCout()">↩ Nouveau calcul</button>
+      </div>
+    </div>
+
+    </div><!-- fin cout-panel-new -->
+
+    <!-- PANEL HISTORIQUE BILANS -->
+    <div id="cout-panel-hist" style="display:none">
+      <div id="bilans-list"></div>
+    </div>
+
+  </div>
+
+  <!-- ASSOLEMENT -->
+  <div class="page" id="page-assolement">
+    <div class="page-title">Suivi Assolement</div>
+    <!-- VUES -->
+    <div class="asso-tabs">
+      <button class="asso-tab active" id="atab-parcelles" onclick="switchAssoTab('parcelles')">Par parcelles</button>
+      <button class="asso-tab" id="atab-cultures" onclick="switchAssoTab('cultures')">Par cultures</button>
+    </div>
+    <div id="asso-panel-parcelles"></div>
+    <div id="asso-panel-cultures" style="display:none"></div>
+  </div>
+
+  <!-- PARAMETRES -->
+  <div class="page" id="page-parametres">
+    <div class="page-title">Paramètres</div>
+    <div class="card">
+      <div class="card-title">☁️ Synchronisation Kdrive</div>
+      <div id="sync-status-display"></div>
+      <label>URL WebDAV Kdrive</label>
+      <input id="cfg-url" type="url" placeholder="https://kdrive.infomaniak.com/app/drive/XXXXX/remote.php/dav/files/email@exemple.com/AgriSuivi/" autocomplete="off">
+      <label>Identifiant Infomaniak (email)</label>
+      <input id="cfg-user" type="email" placeholder="votre@email.com" autocomplete="off">
+      <label>Mot de passe d'application</label>
+      <input id="cfg-pass" type="password" placeholder="Généré sur manager.infomaniak.com" autocomplete="new-password">
+      <div style="margin-top:8px;padding:10px 12px;background:var(--amber-light);border-radius:var(--radius);font-size:12px;color:var(--amber)">
+        💡 Créer un <strong>mot de passe d'application</strong> sur manager.infomaniak.com → Mon compte → Sécurité → Mots de passe d'application.
+      </div>
+      <div class="row2" style="margin-top:12px">
+        <button class="btn" onclick="saveConfig()">💾 Enregistrer</button>
+        <button class="btn btn-primary" onclick="testSync()">🔄 Synchroniser</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">💶 Tarifs par défaut</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Ces valeurs sont utilisées comme point de départ dans le calculateur de coûts.</div>
+      <div class="tarif-row"><label>🧑‍🌾 Chauffeur (€/h)</label><input type="number" id="cfg-chauffeur" step="0.5" min="0"></div>
+      <div class="tarif-row"><label>🚜 Tracteur (€/h, hors chauffeur)</label><input type="number" id="cfg-tracteur" step="0.5" min="0"></div>
+      <div style="font-size:12px;color:var(--text-muted);margin:8px 0 4px;font-style:italic">Coût matériel par type en €/ha (hors tracteur et chauffeur) :</div>
+      <div id="cfg-tarifs-materiel"></div>
+      <button class="btn btn-primary btn-block" onclick="saveTarifs()">💾 Sauvegarder les tarifs</button>
+    </div>
+    <div class="card">
+      <div class="card-title">📋 Installation</div>
+      <div style="font-size:13px;color:var(--text-muted);line-height:1.8">
+        <strong>📱 Android (Chrome) :</strong> Menu ⋮ → "Ajouter à l'écran d'accueil"<br>
+        <strong>🐧 Ubuntu (Chrome) :</strong> Icône ⊕ dans la barre d'adresse → "Installer"<br>
+        <strong>🐧 Ubuntu (Firefox) :</strong> Ouvrir le fichier, puis ajouter en signet
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🗄️ Données locales</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px" id="data-info"></div>
+      <div class="row2">
+        <button class="btn btn-sm" onclick="importJSON()">📂 Importer JSON</button>
+        <button class="btn btn-sm btn-danger" onclick="clearData()">🗑️ Effacer tout</button>
+      </div>
+      <input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImport(event)">
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL EDITION PARCELLE -->
+<div class="modal-overlay" id="modal-parcelle">
+  <div class="modal-box">
+    <div class="modal-title">✏️ Modifier la parcelle</div>
+    <input type="hidden" id="edit-p-id">
+    <label>Nom</label>
+    <input id="edit-p-nom" placeholder="Nom de la parcelle" autocomplete="off">
+    <label>Superficie (ha)</label>
+    <input id="edit-p-sup" type="number" step="0.01" min="0">
+    <label>Culture principale</label>
+    <input id="edit-p-culture" placeholder="ex : Blé" autocomplete="off">
+    <div class="row2" style="margin-top:14px">
+      <button class="btn" onclick="closeModalParcelle()">Annuler</button>
+      <button class="btn btn-primary" onclick="saveEditParcelle()">💾 Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+
+<nav class="nav">
+  <button class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Accueil
+  </button>
+  <button class="nav-item" id="nav-parcelles" onclick="showPage('parcelles')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Parcelles
+  </button>
+  <button class="nav-item" id="nav-saisie" onclick="showPage('saisie')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Saisir
+  </button>
+  <button class="nav-item" id="nav-historique" onclick="showPage('historique')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></svg>Historique
+  </button>
+  <button class="nav-item" id="nav-couts" onclick="showPage('couts')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Coûts
+  </button>
+  <button class="nav-item" id="nav-assolement" onclick="showPage('assolement')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Assolement
+  </button>
+  <button class="nav-item" id="nav-parametres" onclick="showPage('parametres')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Réglages
+  </button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONSTANTES ─────────────────────────────────────────────────────────────
+const TYPES = {
+  "Travail du sol":["Fissuration","Scalpage","Rotavator","Déchaumeur à disques","Cultivateur","Vibroculteur","Cover crop","Labour"],
+  "Roulage":[],"Semis":[],"Fertilisation":[],"Pulvérisation":[],"Récolte":[],
+  "Fauche fourrage":[],"Fauchage / Andainage":[],"Broyage":[]
+};
+const TYPE_CHIP={"Travail du sol":"chip-ts","Roulage":"chip-ro","Semis":"chip-se","Fertilisation":"chip-fe","Pulvérisation":"chip-pu","Récolte":"chip-re","Fauche fourrage":"chip-ff","Fauchage / Andainage":"chip-fa","Broyage":"chip-br"};
+const TYPE_CODE={"Travail du sol":"SOL","Roulage":"ROU","Semis":"SEM","Fertilisation":"FER","Pulvérisation":"PUL","Récolte":"REC","Fauche fourrage":"FAU","Fauchage / Andainage":"AND","Broyage":"BRO"};
+
+// Tarifs matériel par défaut (€/ha, hors tracteur et chauffeur)
+// Source : Barème d'entraide CUMA/Chambres d'agriculture 2024-2025
+const TARIFS_DEFAUT = {
+  chauffeur: 30,   // €/h chauffeur
+  tracteur: 50,    // €/h tracteur hors chauffeur
+  materiel: {      // €/ha matériel seul (amort. + entretien + usure), hors tracteur et MO
+    "Travail du sol": 22,      // déchaumeur à disques 4m : ~20-25 €/ha
+    "Roulage": 8,              // rouleau Cambridge : ~6-10 €/ha
+    "Semis": 28,               // semoir combiné 4m : ~25-32 €/ha
+    "Fertilisation": 6,        // épandeur centrifuge : ~5-8 €/ha
+    "Pulvérisation": 7,        // pulvérisateur porté 1500L : ~6-9 €/ha
+    "Récolte": 55,             // moissonneuse-batteuse (part matériel) : ~45-65 €/ha
+    "Fauche fourrage": 18,     // faucheuse conditionneuse : ~15-22 €/ha
+    "Fauchage / Andainage": 12 // andaineur : ~10-14 €/ha
+  }
+};
+
+// ── ÉTAT ────────────────────────────────────────────────────────────────────
+let parcelles=[], interventions=[], config={}, tarifs={}, bilans=[], assolement=[], deferredInstall=null;
+
+function loadLocal(){
+  try{parcelles=JSON.parse(localStorage.getItem('as_parcelles')||'[]');}catch(e){parcelles=[];}
+  try{interventions=JSON.parse(localStorage.getItem('as_interventions')||'[]');}catch(e){interventions=[];}
+  try{config=JSON.parse(localStorage.getItem('as_config')||'{}');}catch(e){config={};}
+  try{tarifs=JSON.parse(localStorage.getItem('as_tarifs')||'null');}catch(e){tarifs=null;}
+  try{bilans=JSON.parse(localStorage.getItem('as_bilans')||'[]');}catch(e){bilans=[];}
+  try{assolement=JSON.parse(localStorage.getItem('as_assolement')||'[]');}catch(e){assolement=[];}
+  if(!tarifs) tarifs=JSON.parse(JSON.stringify(TARIFS_DEFAUT));
+}
+function saveLocal(){
+  localStorage.setItem('as_parcelles',JSON.stringify(parcelles));
+  localStorage.setItem('as_interventions',JSON.stringify(interventions));
+}
+function saveBilans(){localStorage.setItem('as_bilans',JSON.stringify(bilans));}
+function saveAssolementLocal(){localStorage.setItem('as_assolement',JSON.stringify(assolement));}
+function saveTarifsLocal(){localStorage.setItem('as_tarifs',JSON.stringify(tarifs));}
+function saveConfig(){
+  config.url=document.getElementById('cfg-url').value.trim();
+  config.user=document.getElementById('cfg-user').value.trim();
+  config.pass=document.getElementById('cfg-pass').value;
+  localStorage.setItem('as_config',JSON.stringify(config));
+  toast('Configuration enregistrée'); updateSyncUI();
+}
+loadLocal();
+let coutSelection=[], intrants=[];
+
+// ── NAV ─────────────────────────────────────────────────────────────────────
+const PAGES=['dashboard','parcelles','saisie','historique','couts','assolement','parametres'];
+function showPage(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.getElementById('nav-'+p).classList.add('active');
+  if(p==='dashboard')renderDashboard();
+  if(p==='parcelles')renderParcelles();
+  if(p==='saisie')initSaisie();
+  if(p==='historique')initHistorique();
+  if(p==='couts')initCouts();
+  if(p==='assolement')initAssolement();
+  if(p==='parametres')initParametres();
+}
+
+// ── TOAST ───────────────────────────────────────────────────────────────────
+function toast(msg,dur=2500){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),dur);}
+
+// ── DASHBOARD ───────────────────────────────────────────────────────────────
+function renderDashboard(){
+  const totalHa=parcelles.reduce((s,p)=>s+(parseFloat(p.sup)||0),0);
+  document.getElementById('stats').innerHTML=`
+    <div class="stat"><div class="stat-n">${parcelles.length}</div><div class="stat-l">Parcelles</div></div>
+    <div class="stat"><div class="stat-n">${totalHa.toFixed(1)}</div><div class="stat-l">Hectares</div></div>
+    <div class="stat"><div class="stat-n">${interventions.length}</div><div class="stat-l">Interventions</div></div>`;
+  const el=document.getElementById('recent-list');
+  const recent=interventions.slice(0,6);
+  if(!recent.length){el.innerHTML='<div class="empty"><div class="empty-icon">🌱</div><div class="empty-text">Aucune intervention encore.<br>Commencez par créer une parcelle !</div></div>';return;}
+  el.innerHTML=recent.map(renderItem).join('');
+}
+
+// ── PARCELLES ───────────────────────────────────────────────────────────────
+function addParcelle(){
+  const nom=document.getElementById('p-nom').value.trim();
+  const sup=parseFloat(document.getElementById('p-sup').value);
+  const culture=document.getElementById('p-culture').value.trim();
+  if(!nom){toast('⚠️ Veuillez saisir un nom');return;}
+  parcelles.push({id:Date.now(),nom,sup:isNaN(sup)?0:sup,culture});
+  saveLocal();syncIfConfigured();
+  document.getElementById('p-nom').value='';document.getElementById('p-sup').value='';document.getElementById('p-culture').value='';
+  renderParcelles();toast('✅ Parcelle ajoutée');
+}
+function openModalParcelle(id){
+  const p=parcelles.find(x=>x.id===id);if(!p)return;
+  document.getElementById('edit-p-id').value=id;
+  document.getElementById('edit-p-nom').value=p.nom;
+  document.getElementById('edit-p-sup').value=p.sup||'';
+  document.getElementById('edit-p-culture').value=p.culture||'';
+  document.getElementById('modal-parcelle').classList.add('open');
+}
+function closeModalParcelle(){document.getElementById('modal-parcelle').classList.remove('open');}
+function saveEditParcelle(){
+  const id=parseInt(document.getElementById('edit-p-id').value);
+  const nom=document.getElementById('edit-p-nom').value.trim();
+  const sup=parseFloat(document.getElementById('edit-p-sup').value)||0;
+  const culture=document.getElementById('edit-p-culture').value.trim();
+  if(!nom){toast('⚠️ Nom requis');return;}
+  const idx=parcelles.findIndex(p=>p.id===id);
+  if(idx>=0){
+    parcelles[idx]={...parcelles[idx],nom,sup,culture};
+    // Mettre à jour le nom dans les interventions
+    interventions.forEach(i=>{if(i.parcelleId===id)i.parcelleNom=nom;});
+    saveLocal();syncIfConfigured();
+  }
+  closeModalParcelle();renderParcelles();toast('✅ Parcelle modifiée');
+}
+function deleteParcelle(id){
+  if(!confirm('Supprimer cette parcelle ?'))return;
+  parcelles=parcelles.filter(p=>p.id!==id);saveLocal();syncIfConfigured();renderParcelles();
+}
+function renderParcelles(){
+  const el=document.getElementById('parcelles-list');
+  if(!parcelles.length){el.innerHTML='<div class="empty"><div class="empty-icon">🗺️</div><div class="empty-text">Aucune parcelle enregistrée</div></div>';return;}
+  el.innerHTML=parcelles.map(p=>{
+    const nb=interventions.filter(i=>i.parcelleId===p.id).length;
+    return`<div class="card" style="margin-bottom:8px;cursor:pointer" onclick="goParcelleHistorique(${p.id})">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:38px;height:38px;background:var(--green-light);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🌾</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:15px;font-weight:600">${p.nom}</div>
+          <div style="font-size:12px;color:var(--text-muted)">${p.sup>0?p.sup+' ha':'—'}${p.culture?' · '+p.culture:''} · ${nb} intervention${nb!==1?'s':''}</div>
+        </div>
+        <button class="btn btn-icon btn-sm" onclick="event.stopPropagation();openModalParcelle(${p.id})" title="Modifier" style="padding:5px 8px">✏️</button>
+        <button class="btn btn-icon btn-danger btn-sm" onclick="event.stopPropagation();deleteParcelle(${p.id})">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function goParcelleHistorique(pid){
+  showPage('historique');
+  setTimeout(()=>{
+    document.getElementById('f-parcelle').value=pid;
+    renderHistorique();
+  },50);
+}
+
+// ── CULTURES COURANTES ───────────────────────────────────────────────────────
+const CULTURES_COURANTES = [
+  // Céréales
+  'Blé tendre','Blé dur','Orge de printemps','Orge d\'hiver','Triticale','Avoine','Seigle','Épeautre',
+  // Oléagineux
+  'Colza','Tournesol','Lin oléagineux',
+  // Protéagineux
+  'Pois de printemps','Pois d\'hiver','Féverole de printemps','Féverole d\'hiver','Lupin','Soja',
+  // Maïs
+  'Maïs grain','Maïs ensilage','Maïs fourrage',
+  // Fourrages / prairies
+  'Prairie temporaire','Prairie permanente','Ray-grass','Luzerne','Trèfle','Fléole','Dactyle','Sorgho fourrager',
+  // Couverts
+  'Couvert hivernal','Mélange couverts','Moutarde','Phacélie','Radis fourrager','Avoine brésilienne',
+  // Betteraves / pommes de terre
+  'Betterave sucrière','Betterave fourragère','Pomme de terre',
+  // Légumes / divers
+  'Oignons','Carottes','Autre'
+];
+
+// ── SAISIE ──────────────────────────────────────────────────────────────────
+function addParcelleSelect(selectedId){
+  const wrap=document.getElementById('i-parcelles-wrap');
+  const idx=wrap.children.length;
+  const div=document.createElement('div');
+  div.className='cout-parcelle-line';
+  div.style.marginBottom='6px';
+  div.innerHTML=`<select onchange="onParcelleChange(this)">
+    <option value="">— Choisir une parcelle —</option>
+    ${parcelles.map(p=>`<option value="${p.id}" ${p.id==selectedId?'selected':''}>${p.nom}</option>`).join('')}
+  </select>
+  ${idx>0?`<button class="btn btn-icon btn-danger btn-sm" onclick="this.parentElement.remove();updateMiniHist()" style="flex-shrink:0;padding:6px 9px">✕</button>`:''}`;
+  wrap.appendChild(div);
+  if(selectedId) onParcelleChange(div.querySelector('select'));
+}
+
+function getSelectedParcelles(){
+  const sels=document.querySelectorAll('#i-parcelles-wrap select');
+  const pids=[];
+  sels.forEach(s=>{if(s.value&&!pids.includes(parseInt(s.value)))pids.push(parseInt(s.value));});
+  return pids;
+}
+
+function initSaisie(){
+  // Init parcelles (garder sélection courante)
+  const wrap=document.getElementById('i-parcelles-wrap');
+  if(!wrap.children.length) addParcelleSelect();
+  else{
+    // Rafraîchir les options de chaque select
+    wrap.querySelectorAll('select').forEach(sel=>{
+      const cur=sel.value;
+      sel.innerHTML='<option value="">— Choisir une parcelle —</option>'+parcelles.map(p=>`<option value="${p.id}" ${p.id==cur?'selected':''}>${p.nom}</option>`).join('');
+    });
+  }
+  const tSel=document.getElementById('i-type');const curT=tSel.value;
+  tSel.innerHTML='<option value="">— Choisir —</option>'+Object.keys(TYPES).map(t=>`<option value="${t}" ${t===curT?'selected':''}>${t}</option>`).join('');
+  if(!document.getElementById('i-date').value) document.getElementById('i-date').value=new Date().toISOString().split('T')[0];
+  const culturesAsso=[...new Set(interventions.filter(i=>i.type==='Semis'&&i.materiel).map(i=>i.materiel))];
+  document.getElementById('i-materiel-datalist').innerHTML=culturesAsso.map(c=>`<option value="${c}">`).join('');
+  const culturesUsed=[...new Set([...culturesAsso,...CULTURES_COURANTES])];
+  document.getElementById('i-culture-select').innerHTML=
+    '<option value="">— Choisir une culture —</option>'+
+    culturesUsed.map(c=>`<option value="${c}">${c}</option>`).join('');
+  updateSousTypes();
+}
+
+function onParcelleChange(sel){
+  updateMiniHist();
+}
+
+function updateMiniHist(){
+  const pids=getSelectedParcelles();
+  const wrap=document.getElementById('saisie-mini-hist');
+  const list=document.getElementById('saisie-mini-hist-list');
+  if(!pids.length){wrap.style.display='none';return;}
+  // Afficher historique de la première parcelle sélectionnée
+  const pid=pids[0];
+  const items=interventions.filter(i=>i.parcelleId===pid).slice(0,8);
+  if(!items.length){wrap.style.display='none';return;}
+  const nom=parcelles.find(p=>p.id===pid)?.nom||'';
+  wrap.style.display='block';
+  document.querySelector('.mini-hist-title').textContent=`Dernières interventions — ${nom}`;
+  list.innerHTML=items.map(i=>{
+    const chip=TYPE_CHIP[i.type]||'chip-ro';
+    const code=TYPE_CODE[i.type]||'?';
+    const label=i.soustype?`${i.type} – ${i.soustype}`:i.type;
+    return`<div style="display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px">
+      <span class="chip ${chip}" style="font-size:10px;padding:1px 5px">${code}</span>
+      <span style="flex:1;font-weight:500">${label}${i.materiel?' · '+i.materiel:''}</span>
+      <span style="color:var(--text-muted);flex-shrink:0">${fmtDate(i.date)}</span>
+    </div>`;
+  }).join('');
+}
+
+function updateSousTypes(){
+  const t=document.getElementById('i-type').value;
+  const wrap=document.getElementById('sous-type-wrap');const st=document.getElementById('i-soustype');
+  if(t&&TYPES[t]&&TYPES[t].length){st.innerHTML=TYPES[t].map(s=>`<option value="${s}">${s}</option>`).join('');wrap.style.display='block';}
+  else{wrap.style.display='none';}
+  // Basculer le champ matériel / culture
+  const isSemis=t==='Semis';
+  document.getElementById('i-materiel-label').textContent=isSemis?'Culture *':'Matériel / Produit';
+  document.getElementById('i-materiel').style.display=isSemis?'none':'block';
+  document.getElementById('i-culture-wrap').style.display=isSemis?'block':'none';
+  if(isSemis) onCultureSelectChange();
+}
+
+function onCultureSelectChange(){
+  const val=document.getElementById('i-culture-select').value;
+  const customInput=document.getElementById('i-culture-custom');
+  if(val==='Autre'||val===''){
+    customInput.style.display='block';
+    customInput.placeholder=val===''?'Ou saisir directement...':'Saisir la culture...';
+  } else {
+    customInput.style.display='none';
+    customInput.value='';
+  }
+}
+
+function getCultureValue(){
+  // Retourne la valeur culture pour un semis
+  const sel=document.getElementById('i-culture-select').value;
+  const custom=document.getElementById('i-culture-custom').value.trim();
+  if(sel==='Autre'||sel==='') return custom;
+  return sel;
+}
+
+function addIntervention(){
+  const pids=getSelectedParcelles();
+  const type=document.getElementById('i-type').value;
+  const date=document.getElementById('i-date').value;
+  if(!pids.length){toast('⚠️ Choisissez au moins une parcelle');return;}
+  if(!type){toast('⚠️ Choisissez un type');return;}
+  if(!date){toast('⚠️ Saisissez une date');return;}
+  const soustype=TYPES[type]&&TYPES[type].length?document.getElementById('i-soustype').value:'';
+  const temps=parseFloat(document.getElementById('i-temps').value)||0;
+  let materiel='';
+  if(type==='Semis'){
+    materiel=getCultureValue();
+    if(!materiel){toast('⚠️ Indiquez la culture semée');return;}
+  } else {
+    materiel=document.getElementById('i-materiel').value.trim();
+  }
+  const comment=document.getElementById('i-comment').value.trim();
+  // Créer une intervention pour chaque parcelle sélectionnée
+  pids.forEach((pid,i)=>{
+    const parcelle=parcelles.find(p=>p.id===pid);
+    interventions.unshift({
+      id:Date.now()+i,
+      parcelleId:pid,
+      parcelleNom:parcelle?parcelle.nom:'',
+      type,soustype,date,temps,materiel,comment
+    });
+  });
+  saveLocal();syncIfConfigured();
+  // Reset formulaire
+  const wrap=document.getElementById('i-parcelles-wrap');
+  wrap.innerHTML='';addParcelleSelect();
+  document.getElementById('i-temps').value='';
+  document.getElementById('i-materiel').value='';
+  document.getElementById('i-culture-select').value='';
+  document.getElementById('i-culture-custom').value='';
+  document.getElementById('i-culture-custom').style.display='none';
+  document.getElementById('i-comment').value='';
+  document.getElementById('i-type').value='';
+  document.getElementById('sous-type-wrap').style.display='none';
+  document.getElementById('i-materiel').style.display='block';
+  document.getElementById('i-culture-wrap').style.display='none';
+  document.getElementById('i-materiel-label').textContent='Matériel / Produit';
+  document.getElementById('saisie-mini-hist').style.display='none';
+  const nb=pids.length;
+  toast(`✅ ${nb} intervention${nb>1?'s enregistrées':' enregistrée'}`);
+  showPage('historique');
+}
+
+// ── HISTORIQUE ──────────────────────────────────────────────────────────────
+function initHistorique(){
+  const fp=document.getElementById('f-parcelle').value;const ft=document.getElementById('f-type').value;
+  document.getElementById('f-parcelle').innerHTML='<option value="">Toutes parcelles</option>'+parcelles.map(p=>`<option value="${p.id}" ${p.id==fp?'selected':''}>${p.nom}</option>`).join('');
+  document.getElementById('f-type').innerHTML='<option value="">Tous types</option>'+Object.keys(TYPES).map(t=>`<option value="${t}" ${t===ft?'selected':''}>${t}</option>`).join('');
+  renderHistorique();
+}
+function renderHistorique(){
+  const fp=document.getElementById('f-parcelle').value;const ft=document.getElementById('f-type').value;
+  const fd=document.getElementById('f-debut').value;const ff=document.getElementById('f-fin').value;
+  let filtered=interventions.filter(i=>{
+    if(fp&&i.parcelleId!=fp)return false;if(ft&&i.type!==ft)return false;
+    if(fd&&i.date<fd)return false;if(ff&&i.date>ff)return false;return true;
+  });
+  const el=document.getElementById('historique-list');
+  if(!filtered.length){el.innerHTML='<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">Aucune intervention trouvée</div></div>';return;}
+  const totalH=filtered.reduce((s,i)=>s+(parseFloat(i.temps)||0),0);
+  el.innerHTML=`<div style="font-size:12px;color:var(--text-muted);padding:0 2px 10px">${filtered.length} intervention${filtered.length>1?'s':''} · ${totalH.toFixed(1)}h au total</div>`
+    +`<div class="card" style="padding:8px 12px">${filtered.map(renderItem).join('')}</div>`;
+}
+function renderItem(i){
+  const chip=TYPE_CHIP[i.type]||'chip-ro';const code=TYPE_CODE[i.type]||i.type.substring(0,3).toUpperCase();
+  const label=i.soustype?`${i.type} – ${i.soustype}`:i.type;
+  return`<div class="list-item">
+    <span class="chip ${chip}" style="margin-top:2px">${code}</span>
+    <div class="li-body"><div class="li-title">${label}</div>
+    <div class="li-sub"><span class="p-badge">📍 ${i.parcelleNom}</span>&nbsp;📅 ${fmtDate(i.date)}${i.temps?` · ⏱ ${i.temps}h`:''}${i.materiel?' · '+i.materiel:''}</div>
+    ${i.comment?`<div class="li-comment">💬 ${i.comment}</div>`:''}</div>
+    <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0;margin-top:2px">
+      <button class="btn btn-icon btn-sm" onclick="editIntervention(${i.id})" title="Modifier" style="padding:4px 7px">✏️</button>
+      <button class="btn btn-icon btn-danger btn-sm" onclick="delInterv(${i.id})" style="padding:4px 7px">🗑</button>
+    </div>
+  </div>`;
+}
+
+function editIntervention(id){
+  const interv=interventions.find(x=>x.id===id);
+  if(!interv){toast('Intervention introuvable');return;}
+  showPage('saisie');
+  setTimeout(()=>{
+    // Réinitialiser et pré-remplir la première parcelle
+    const wrap=document.getElementById('i-parcelles-wrap');
+    wrap.innerHTML='';
+    addParcelleSelect(interv.parcelleId);
+    document.getElementById('i-type').value=interv.type;
+    updateSousTypes();
+    setTimeout(()=>{
+      if(interv.soustype){const st=document.getElementById('i-soustype');if(st)st.value=interv.soustype;}
+      document.getElementById('i-date').value=interv.date;
+      document.getElementById('i-temps').value=interv.temps||'';
+      document.getElementById('i-comment').value=interv.comment||'';
+      if(interv.type==='Semis'){
+        const sel=document.getElementById('i-culture-select');
+        let found=false;
+        for(const opt of sel.options){if(opt.value===interv.materiel){sel.value=interv.materiel;found=true;break;}}
+        if(!found){sel.value='';const ci=document.getElementById('i-culture-custom');ci.style.display='block';ci.value=interv.materiel||'';}
+        onCultureSelectChange();
+      } else {
+        document.getElementById('i-materiel').value=interv.materiel||'';
+      }
+      interventions=interventions.filter(x=>x.id!==id);
+      saveLocal();
+      toast('✏️ Modifiez puis enregistrez');
+    },60);
+  },60);
+}
+
+function delInterv(id){
+  if(!confirm('Supprimer cette intervention ?'))return;
+  interventions=interventions.filter(i=>i.id!==id);saveLocal();syncIfConfigured();renderHistorique();renderDashboard();
+}
+function fmtDate(d){if(!d)return'';const p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
+function fmt(n){return n.toFixed(2).replace('.',',');}
+
+// ── EXPORT ──────────────────────────────────────────────────────────────────
+function getFiltered(){
+  const fp=document.getElementById('f-parcelle')?.value||'';const ft=document.getElementById('f-type')?.value||'';
+  const fd=document.getElementById('f-debut')?.value||'';const ff=document.getElementById('f-fin')?.value||'';
+  return interventions.filter(i=>{
+    if(fp&&i.parcelleId!=fp)return false;if(ft&&i.type!==ft)return false;
+    if(fd&&i.date<fd)return false;if(ff&&i.date>ff)return false;return true;
+  });
+}
+function exportCSV(){
+  const rows=[['Parcelle','Superficie (ha)','Type','Sous-type','Date','Temps (h)','Culture / Matériel','Commentaire']];
+  getFiltered().forEach(i=>{const p=parcelles.find(x=>x.id===i.parcelleId);rows.push([i.parcelleNom,p?p.sup:'',i.type,i.soustype||'',fmtDate(i.date),i.temps||'',i.materiel||'',i.comment||'']);});
+  dl('\uFEFF'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(';')).join('\n'),'interventions_agricoles.csv','text/csv;charset=utf-8');
+  toast('📊 Export CSV prêt');
+}
+function exportJSON(){
+  dl(JSON.stringify({version:'1.2',exportDate:new Date().toISOString(),parcelles,interventions,tarifs,bilans,assolement},null,2),'agrisuivi_backup.json','application/json');
+  toast('💾 Sauvegarde JSON prête');
+}
+function dl(content,filename,mime){
+  const blob=new Blob([content],{type:mime});const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function importJSON(){document.getElementById('import-file').click();}
+function handleImport(e){
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();r.onload=ev=>{
+    try{const data=JSON.parse(ev.target.result);
+      if(data.parcelles)parcelles=data.parcelles;if(data.interventions)interventions=data.interventions;
+      if(data.tarifs)tarifs=data.tarifs;if(data.bilans)bilans=data.bilans;if(data.assolement)assolement=data.assolement;
+      saveLocal();saveTarifsLocal();saveBilans();saveAssolementLocal();toast('✅ Import réussi');renderDashboard();
+    }catch(err){toast('❌ Fichier JSON invalide');}
+  };r.readAsText(file);e.target.value='';
+}
+function clearData(){
+  if(!confirm('Effacer TOUTES les données locales ?'))return;
+  parcelles=[];interventions=[];saveLocal();toast('🗑️ Données effacées');renderDashboard();
+}
+
+// ── TABS COÛTS ───────────────────────────────────────────────────────────────
+function switchCoutTab(t){
+  document.querySelectorAll('.tab-cout').forEach(b=>{b.style.color='var(--text-muted)';b.style.borderBottomColor='transparent';b.style.fontWeight='400';});
+  const active=document.getElementById('tcout-'+t);active.style.color='var(--text)';active.style.borderBottomColor='var(--text)';active.style.fontWeight='500';
+  document.getElementById('cout-panel-new').style.display=t==='new'?'block':'none';
+  document.getElementById('cout-panel-hist').style.display=t==='hist'?'block':'none';
+  if(t==='hist') renderBilans();
+}
+
+// ── CALCUL DES COÛTS ────────────────────────────────────────────────────────
+function addCoutParcelle(){
+  const wrap=document.getElementById('cout-parcelles-selects');
+  const idx=wrap.children.length;
+  const div=document.createElement('div');
+  div.className='cout-parcelle-line';
+  div.innerHTML=`<select>
+    <option value="">— Choisir une parcelle —</option>
+    ${parcelles.map(p=>`<option value="${p.id}">${p.nom}${p.sup?' ('+p.sup+'ha)':''}</option>`).join('')}
+  </select>
+  ${idx>0?`<button class="btn btn-icon btn-danger btn-sm" onclick="this.parentElement.remove()" style="flex-shrink:0;padding:6px 9px">✕</button>`:''}`;
+  wrap.appendChild(div);
+}
+function getSelectedCoutPids(){
+  const sels=document.querySelectorAll('#cout-parcelles-selects select');
+  const pids=new Set();
+  sels.forEach(s=>{if(s.value)pids.add(parseInt(s.value));});
+  return pids;
+}
+function initCouts(){
+  document.getElementById('cout-step1').style.display='block';
+  document.getElementById('cout-step2').style.display='none';
+  document.getElementById('cout-step3').style.display='none';
+  document.getElementById('cout-resultat').style.display='none';
+  switchCoutTab('new');
+  const wrap=document.getElementById('cout-parcelles-selects');
+  wrap.innerHTML='';addCoutParcelle();
+  const ctype=document.getElementById('c-type');
+  ctype.innerHTML='<option value="">Tous les types</option>'+Object.keys(TYPES).map(t=>`<option value="${t}">${t}</option>`).join('');
+  const y=new Date().getFullYear();
+  if(!document.getElementById('c-debut').value) document.getElementById('c-debut').value=`${y}-01-01`;
+  if(!document.getElementById('c-fin').value) document.getElementById('c-fin').value=`${y}-12-31`;
+  intrants=[];
+}
+
+function chargerInterventionsCout(){
+  const debut=document.getElementById('c-debut').value;
+  const fin=document.getElementById('c-fin').value;
+  const ctype=document.getElementById('c-type').value;
+  const pids=getSelectedCoutPids();
+  if(!debut||!fin){toast('⚠️ Renseignez les dates');return;}
+  if(pids.size===0){toast('⚠️ Sélectionnez au moins une parcelle');return;}
+  coutSelection=interventions.filter(i=>{
+    if(!pids.has(i.parcelleId))return false;
+    if(i.date<debut||i.date>fin)return false;
+    if(ctype&&i.type!==ctype)return false;
+    return true;
+  });
+  if(coutSelection.length===0){toast('⚠️ Aucune intervention dans cette sélection');return;}
+  document.getElementById('cout-step2').style.display='block';
+  document.getElementById('t-chauffeur').value=tarifs.chauffeur;
+  document.getElementById('t-tracteur').value=tarifs.tracteur;
+  const mat=document.getElementById('tarifs-materiel');
+  mat.innerHTML=Object.keys(TYPES).map(t=>`
+    <div class="tarif-row">
+      <label><span class="chip ${TYPE_CHIP[t]}" style="margin-right:4px">${TYPE_CODE[t]}</span> ${t}</label>
+      <input type="number" id="tm-${t.replace(/\s|\//g,'_')}" value="${tarifs.materiel[t]||0}" step="0.5" min="0" title="€/ha">
+    </div>`).join('');
+  document.getElementById('cout-step1').style.display='none';
+  document.getElementById('cout-step2').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function goStep3(){
+  tarifs.chauffeur=parseFloat(document.getElementById('t-chauffeur').value)||TARIFS_DEFAUT.chauffeur;
+  tarifs.tracteur=parseFloat(document.getElementById('t-tracteur').value)||TARIFS_DEFAUT.tracteur;
+  Object.keys(TYPES).forEach(t=>{
+    const el=document.getElementById('tm-'+t.replace(/\s|\//g,'_'));
+    if(el) tarifs.materiel[t]=parseFloat(el.value)||0;
+  });
+  saveTarifsLocal();
+
+  const list=document.getElementById('cout-interventions-list');
+  list.innerHTML=coutSelection.map((i,idx)=>{
+    const chip=TYPE_CHIP[i.type]||'chip-ro';
+    const label=i.soustype?`${i.type} – ${i.soustype}`:i.type;
+    const parcelle=parcelles.find(p=>p.id===i.parcelleId);
+    const sup=parseFloat(parcelle?.sup)||0;
+    const tChauffeur=(i.temps||0)*tarifs.chauffeur;
+    const tTracteur=(i.temps||0)*tarifs.tracteur;
+    const tMat=sup*(tarifs.materiel[i.type]||0);
+    const total=tChauffeur+tTracteur+tMat;
+    return`<label class="interv-cout-row" for="ck-${idx}" style="cursor:pointer">
+      <input type="checkbox" class="toggle-check" id="ck-${idx}" checked
+        onchange="this.closest('label').style.opacity=this.checked?'1':'0.45'">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span class="chip ${chip}">${TYPE_CODE[i.type]||'?'}</span>
+          <span style="font-size:13px;font-weight:500">${label}</span>
+          <span class="p-badge" style="font-size:11px">📍 ${i.parcelleNom}</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:3px">
+          📅 ${fmtDate(i.date)} · ⏱ ${i.temps||0}h · 🌾 ${sup}ha
+          · <strong style="color:var(--purple)">${fmt(total)} €</strong>
+          <span style="color:var(--text-faint)">(MO: ${fmt(tChauffeur)}€ + Trac: ${fmt(tTracteur)}€ + Mat: ${fmt(tMat)}€)</span>
+        </div>
+      </div>
+    </label>`;
+  }).join('');
+
+  intrants=[];renderIntrants();
+  document.getElementById('cout-step2').style.display='none';
+  document.getElementById('cout-step3').style.display='block';
+  document.getElementById('cout-step3').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function addIntrant(){
+  intrants.push({nom:'',prix:0,unite:'€/ha',dose:0});renderIntrants();
+}
+function removeIntrant(idx){intrants.splice(idx,1);renderIntrants();}
+function renderIntrants(){
+  const el=document.getElementById('intrants-list');
+  if(intrants.length===0){el.innerHTML='<div style="font-size:13px;color:var(--text-faint);padding:8px 0">Aucun intrant ajouté.</div>';return;}
+  el.innerHTML=intrants.map((intr,idx)=>`
+    <div class="intrant-row">
+      <div><label style="margin:0 0 3px">Désignation</label><input placeholder="ex: Semences blé" value="${intr.nom}" oninput="intrants[${idx}].nom=this.value"></div>
+      <div><label style="margin:0 0 3px">Prix (€)</label><input type="number" step="0.01" min="0" value="${intr.prix}" oninput="intrants[${idx}].prix=parseFloat(this.value)||0"></div>
+      <div><label style="margin:0 0 3px">Unité</label>
+        <select onchange="intrants[${idx}].unite=this.value">
+          <option value="€/ha" ${intr.unite==='€/ha'?'selected':''}>€/ha</option>
+          <option value="€ total" ${intr.unite==='€ total'?'selected':''}>€ total</option>
+        </select>
+      </div>
+      <div style="padding-top:18px"><button class="btn btn-danger btn-sm btn-icon" onclick="removeIntrant(${idx})">🗑</button></div>
+    </div>`).join('');
+}
+
+function calculerCout(){
+  const pidsInSelection=new Set(coutSelection.map(i=>i.parcelleId));
+  const surfaceTotale=parcelles.filter(p=>pidsInSelection.has(p.id)).reduce((s,p)=>s+(parseFloat(p.sup)||0),0);
+  const nomCalc=document.getElementById('c-nom').value.trim()||('Calcul du '+new Date().toLocaleDateString('fr-FR'));
+
+  let totalMO=0, totalTracteur=0, totalMateriel=0, totalIntrants=0;
+  let details=[];
+
+  const checkboxes=document.querySelectorAll('.toggle-check');
+  coutSelection.forEach((i,idx)=>{
+    if(!checkboxes[idx]||!checkboxes[idx].checked)return;
+    const h=parseFloat(i.temps)||0;
+    const parcelle=parcelles.find(p=>p.id===i.parcelleId);
+    const sup=parseFloat(parcelle?.sup)||0;
+    const mo=h*tarifs.chauffeur;
+    const tr=h*tarifs.tracteur;
+    const mt=sup*(tarifs.materiel[i.type]||0);  // €/ha × superficie
+    totalMO+=mo; totalTracteur+=tr; totalMateriel+=mt;
+    details.push({label:(i.soustype?`${i.type} – ${i.soustype}`:i.type)+` (${i.parcelleNom}, ${fmtDate(i.date)}, ${sup}ha)`,montant:mo+tr+mt});
+  });
+
+  intrants.forEach(intr=>{
+    let montant=0;
+    if(intr.unite==='€/ha') montant=(intr.prix||0)*surfaceTotale;
+    else montant=intr.prix||0;
+    totalIntrants+=montant;
+    if(montant>0) details.push({label:`Intrant : ${intr.nom||'—'}`,montant});
+  });
+
+  const total=totalMO+totalTracteur+totalMateriel+totalIntrants;
+  const parHa=surfaceTotale>0?total/surfaceTotale:0;
+
+  document.getElementById('res-nom-label').textContent=nomCalc;
+  document.getElementById('res-total').textContent=fmt(total)+' €';
+  document.getElementById('res-ha').textContent=fmt(parHa);
+  document.getElementById('res-surface').textContent=surfaceTotale.toFixed(2);
+
+  const rows=[
+    {label:'Main-d\'œuvre chauffeur',montant:totalMO},
+    {label:'Tracteur (charges fixes + variables)',montant:totalTracteur},
+    {label:'Matériel (amort. + entretien)',montant:totalMateriel},
+    {label:'Intrants',montant:totalIntrants},
+    {label:'TOTAL',montant:total,bold:true}
+  ];
+  document.getElementById('cout-detail-table').innerHTML=rows.map(r=>`
+    <tr><td style="${r.bold?'font-weight:700;padding-top:8px':''}">${r.label}</td>
+    <td style="text-align:right;${r.bold?'font-weight:700;color:var(--purple)':''}">${fmt(r.montant)} €</td>
+    <td style="text-align:right;color:var(--text-faint);${r.bold?'font-weight:700':''}">
+      ${surfaceTotale>0?fmt(r.montant/surfaceTotale)+' €/ha':'—'}</td></tr>`).join('');
+
+  window._lastCoutResult={nom:nomCalc,total,parHa,surfaceTotale,rows,details,tarifs:JSON.parse(JSON.stringify(tarifs)),date:new Date().toISOString()};
+
+  document.getElementById('cout-step3').style.display='none';
+  document.getElementById('cout-resultat').style.display='block';
+  document.getElementById('cout-resultat').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function enregistrerBilan(){
+  const r=window._lastCoutResult;if(!r)return;
+  const bilan={id:Date.now(),nom:r.nom,date:r.date,total:r.total,parHa:r.parHa,surfaceTotale:r.surfaceTotale,rows:r.rows,details:r.details,tarifs:r.tarifs};
+  bilans.unshift(bilan);saveBilans();syncIfConfigured();
+  toast('✅ Bilan "'+r.nom+'" enregistré !');
+}
+function renderBilans(){
+  const el=document.getElementById('bilans-list');
+  if(!bilans.length){el.innerHTML='<div class="empty"><div class="empty-icon">📁</div><div class="empty-text">Aucun bilan enregistré.<br>Effectuez un calcul et cliquez sur "Enregistrer ce bilan".</div></div>';return;}
+  el.innerHTML=bilans.map((b,idx)=>`
+    <div class="card" style="margin-bottom:10px">
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <div style="flex:1;min-width:0">
+          <div class="bilan-nom">${b.nom}</div>
+          <div class="bilan-meta">📅 ${new Date(b.date).toLocaleDateString('fr-FR')} · 🌾 ${b.surfaceTotale.toFixed(2)} ha</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div class="bilan-montant">${fmt(b.total)} €</div>
+          <div style="font-size:11px;color:var(--text-muted)">${fmt(b.parHa)} €/ha</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+        <button class="btn btn-sm" onclick="toggleBilanDetail(${idx})">📋 Détail</button>
+        <button class="btn btn-sm" onclick="exportBilanCSV(${idx})">📊 CSV</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteBilan(${idx})">🗑</button>
+      </div>
+      <div class="bilan-detail" id="bilan-detail-${idx}">
+        <table class="cout-detail-table" style="margin-top:4px">
+          ${b.rows.map(r=>`<tr>
+            <td style="${r.bold?'font-weight:700;padding-top:6px':''}">${r.label}</td>
+            <td style="text-align:right;${r.bold?'font-weight:700;color:var(--purple)':''}">${fmt(r.montant)} €</td>
+            <td style="text-align:right;color:var(--text-faint)">${b.surfaceTotale>0?fmt(r.montant/b.surfaceTotale)+' €/ha':'—'}</td>
+          </tr>`).join('')}
+        </table>
+        ${b.details.length?`<div style="margin-top:8px;font-size:11px;color:var(--text-muted)">${b.details.map(d=>`${d.label} : ${fmt(d.montant)} €`).join('<br>')}</div>`:''}
+      </div>
+    </div>`).join('');
+}
+function toggleBilanDetail(idx){
+  const el=document.getElementById('bilan-detail-'+idx);
+  el.classList.toggle('open');
+}
+function deleteBilan(idx){
+  if(!confirm('Supprimer ce bilan ?'))return;
+  bilans.splice(idx,1);saveBilans();syncIfConfigured();renderBilans();
+}
+function exportBilanCSV(idx){
+  const b=bilans[idx];if(!b)return;
+  const rows=[['Bilan',b.nom],['Date',new Date(b.date).toLocaleDateString('fr-FR')],['Surface (ha)',b.surfaceTotale.toFixed(2)],[''],['Poste','Montant (€)','€/ha']];
+  b.rows.forEach(r=>rows.push([r.label,fmt(r.montant),b.surfaceTotale>0?fmt(r.montant/b.surfaceTotale):'—']));
+  rows.push([]);rows.push(['Détail interventions et intrants','','']);
+  b.details.forEach(d=>rows.push([d.label,fmt(d.montant),'']));
+  dl('\uFEFF'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(';')).join('\n'),`bilan_${b.nom.replace(/[^a-z0-9]/gi,'_')}.csv`,'text/csv;charset=utf-8');
+  toast('📊 Export prêt');
+}
+
+function exportCoutCSV(){
+  const r=window._lastCoutResult;if(!r)return;
+  const rows=[['Bilan',r.nom],['Date',new Date(r.date).toLocaleDateString('fr-FR')],['Surface (ha)',r.surfaceTotale.toFixed(2)],[''],['Poste','Montant total (€)','Coût/ha (€/ha)']];
+  r.rows.forEach(row=>rows.push([row.label,fmt(row.montant),r.surfaceTotale>0?fmt(row.montant/r.surfaceTotale):'—']));
+  rows.push([]);rows.push(['Détail par intervention','','']);
+  r.details.forEach(d=>rows.push([d.label,fmt(d.montant),'']));
+  dl('\uFEFF'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(';')).join('\n'),'bilan_couts.csv','text/csv;charset=utf-8');
+  toast('📊 Bilan exporté');
+}
+function resetCout(){
+  document.getElementById('cout-resultat').style.display='none';
+  document.getElementById('cout-step1').style.display='block';
+  document.getElementById('c-nom').value='';
+  intrants=[];
+}
+
+// ── ASSOLEMENT ───────────────────────────────────────────────────────────────
+const ASSO_COLORS=['#3B6D11','#185FA5','#854F0B','#0F6E56','#993C1D','#534AB7','#993556','#639922','#1D9E75','#BA7517','#A32D2D','#5F5E5A'];
+let _assoColorMap={};
+function cultureColor(c){
+  if(!_assoColorMap[c]){const used=Object.keys(_assoColorMap).length;_assoColorMap[c]=ASSO_COLORS[used%ASSO_COLORS.length];}
+  return _assoColorMap[c];
+}
+function hexToRgba(hex,a){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return`rgba(${r},${g},${b},${a})`;}
+
+// Retourne l'assolement enrichi = entrées manuelles + auto-générées depuis les semis
+// Chaque entrée : {id, parcelleId, parcelleNom, sup, culture, dateDebut, dateFin(null=en cours), source:'manuel'|'semis'}
+function getAssolementComplet(){
+  const today=new Date().toISOString().split('T')[0];
+  // Partir des entrées manuelles
+  const manual=assolement.map(a=>({...a,source:a.source||'manuel'}));
+  const manualIds=new Set(manual.map(a=>a.id));
+
+  // Générer depuis les semis : un semis = début d'une période
+  // Pour chaque parcelle, trier les semis par date, déduire la fin = date du semis suivant sur la même parcelle
+  const semisByParcelle={};
+  interventions.filter(i=>i.type==='Semis').forEach(i=>{
+    if(!semisByParcelle[i.parcelleId]) semisByParcelle[i.parcelleId]=[];
+    semisByParcelle[i.parcelleId].push(i);
+  });
+
+  const auto=[];
+  Object.keys(semisByParcelle).forEach(pid=>{
+    const semis=semisByParcelle[pid].slice().sort((a,b)=>a.date.localeCompare(b.date));
+    const parcelle=parcelles.find(p=>p.id==pid);
+    semis.forEach((s,idx)=>{
+      const culture=s.materiel||(s.comment&&s.comment.length<40?s.comment:null)||'Culture non renseignée';
+      const dateDebut=s.date;
+      // Fin = date du prochain semis sur la même parcelle (si existe)
+      const dateFin=idx<semis.length-1?semis[idx+1].date:null;
+      // Vérifier qu'une entrée manuelle ne couvre pas déjà cette période/parcelle
+      const alreadyManual=manual.some(m=>m.parcelleId==pid&&m.dateDebut===dateDebut);
+      if(!alreadyManual){
+        auto.push({
+          id:'semis_'+s.id,
+          parcelleId:parseInt(pid),
+          parcelleNom:parcelle?parcelle.nom:s.parcelleNom,
+          sup:parcelle?parcelle.sup:0,
+          culture,
+          dateDebut,
+          dateFin,
+          source:'semis',
+          interventionId:s.id
+        });
+      }
+    });
+  });
+
+  // Fusionner et trier par dateDebut
+  return [...manual,...auto].sort((a,b)=>a.dateDebut.localeCompare(b.dateDebut));
+}
+
+// Durée en texte depuis une date
+function dureeDepuis(dateDebut, dateFin){
+  const debut=new Date(dateDebut);
+  const fin=dateFin?new Date(dateFin):new Date();
+  const jours=Math.round((fin-debut)/(1000*60*60*24));
+  if(jours<0) return '';
+  if(jours<30) return `${jours}j`;
+  if(jours<365){const m=Math.round(jours/30);return`${m} mois`;}
+  const y=Math.floor(jours/365),rm=Math.round((jours%365)/30);
+  return rm>0?`${y}a ${rm}m`:`${y} an${y>1?'s':''}`;
+}
+
+function initAssolement(){
+  const all=getAssolementComplet();
+  _assoColorMap={};all.forEach(a=>cultureColor(a.culture));
+  renderAssolement();
+}
+
+function deleteAssoEntry(id){
+  if(String(id).startsWith('semis_')){
+    toast('💡 Cette entrée vient d\'un Semis. Modifiez le champ Culture du semis pour la changer.');return;
+  }
+  if(!confirm('Supprimer cette période ?'))return;
+  assolement=assolement.filter(a=>a.id!==id);
+  saveAssolementLocal();syncIfConfigured();initAssolement();
+}
+
+function editAssoEntry(id){
+  if(String(id).startsWith('semis_')){
+    toast('💡 Modifiez le champ Culture du Semis correspondant pour changer la culture.');return;
+  }
+  // Supprimer simplement (l'utilisateur re-saisit via le semis)
+  if(!confirm('Supprimer cette entrée manuelle ?'))return;
+  assolement=assolement.filter(x=>x.id!==id);
+  saveAssolementLocal();syncIfConfigured();initAssolement();
+}
+
+function switchAssoTab(t){
+  document.querySelectorAll('.asso-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('atab-'+t).classList.add('active');
+  document.getElementById('asso-panel-parcelles').style.display=t==='parcelles'?'block':'none';
+  document.getElementById('asso-panel-cultures').style.display=t==='cultures'?'block':'none';
+}
+
+function renderAssolement(){
+  const all=getAssolementComplet();
+  if(!all.length){
+    document.getElementById('asso-panel-parcelles').innerHTML='<div class="empty"><div class="empty-icon">🌱</div><div class="empty-text">Aucune donnée d\'assolement.<br>Saisissez des interventions Semis (avec la culture dans le champ Matériel/Produit) ou ajoutez une période manuelle.</div></div>';
+    document.getElementById('asso-panel-cultures').innerHTML='';return;
+  }
+  renderAssoParcelles(all);
+  renderAssoCultures(all);
+}
+
+function renderAssoParcelles(all){
+  const today=new Date().toISOString().split('T')[0];
+  const el=document.getElementById('asso-panel-parcelles');
+  // Grouper par parcelle
+  const byParcelle={};
+  all.forEach(a=>{
+    if(!byParcelle[a.parcelleId]) byParcelle[a.parcelleId]={nom:a.parcelleNom,sup:a.sup,entries:[]};
+    byParcelle[a.parcelleId].entries.push(a);
+  });
+
+  let html='';
+  Object.values(byParcelle).sort((a,b)=>a.nom.localeCompare(b.nom)).forEach(p=>{
+    const sorted=p.entries.slice().sort((a,b)=>b.dateDebut.localeCompare(a.dateDebut)); // plus récent en premier
+    html+=`<div class="card" style="margin-bottom:10px">
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px">
+        <span style="font-size:15px;font-weight:600">🌾 ${p.nom}</span>
+        <span style="font-size:12px;color:var(--text-muted)">${p.sup?p.sup+' ha':''}</span>
+      </div>`;
+    sorted.forEach(a=>{
+      const col=cultureColor(a.culture);
+      const enCours=!a.dateFin||a.dateFin>today;
+      const duree=dureeDepuis(a.dateDebut,a.dateFin);
+      const anneeDebut=a.dateDebut.split('-')[0];
+      const labelPeriode=a.dateFin
+        ?`${fmtDate(a.dateDebut)} → ${fmtDate(a.dateFin)}`
+        :`Depuis le ${fmtDate(a.dateDebut)}`;
+      html+=`<div class="asso-parcelle-row">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <span class="asso-culture-badge" style="background:${hexToRgba(col,0.15)};color:${col}">${a.culture}</span>
+            ${enCours?`<span style="background:#EAF3DE;color:#3B6D11;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px">EN COURS · ${duree}</span>`:''}
+            ${a.source==='semis'?`<span style="font-size:10px;color:var(--text-faint)">auto 🌱</span>`:''}
+          </div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:3px">${labelPeriode}${duree&&!enCours?` · ${duree}`:''}</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-shrink:0">
+          ${a.source!=='semis'?`<button class="btn btn-icon btn-sm" onclick="editAssoEntry(${JSON.stringify(a.id)})" title="Modifier" style="padding:4px 7px">✏️</button>`:''}
+          <button class="btn btn-icon btn-danger btn-sm" onclick="deleteAssoEntry(${JSON.stringify(a.id)})" style="padding:4px 7px">🗑</button>
+        </div>
+      </div>`;
+    });
+    html+='</div>';
+  });
+  el.innerHTML=html;
+}
+
+function renderAssoCultures(all){
+  const today=new Date().toISOString().split('T')[0];
+  const el=document.getElementById('asso-panel-cultures');
+  _assoColorMap={};all.slice().sort((a,b)=>a.dateDebut.localeCompare(b.dateDebut)).forEach(a=>cultureColor(a.culture));
+  const currentYear=new Date().getFullYear().toString();
+  let html='';
+  // Section En cours
+  const enCours=all.filter(a=>!a.dateFin||a.dateFin>today);
+  if(enCours.length){
+    html+=`<div class="asso-year-head">🟢 En cours</div>`;
+    html+=renderAnneeCultures(enCours,true,today,'encours');
+  }
+  // Années passées (sans l'année courante si "en cours" déjà affiché)
+  const years=[...new Set(all.map(a=>a.dateDebut.split('-')[0]))].sort((a,b)=>b-a);
+  years.forEach(y=>{
+    if(y===currentYear&&enCours.length) return; // déjà dans "en cours"
+    const entries=all.filter(a=>a.dateDebut.startsWith(y));
+    html+=`<div class="asso-year-head">${y}</div>`;
+    html+=renderAnneeCultures(entries,false,today,y);
+  });
+  el.innerHTML=html;
+}
+
+function renderAnneeCultures(entries,showDuree,today,uid){
+  // Agréger par culture
+  const byCulture={};
+  entries.forEach(a=>{
+    if(!byCulture[a.culture])byCulture[a.culture]={ha:0,parcelles:[]};
+    byCulture[a.culture].ha+=(parseFloat(a.sup)||0);
+    if(!byCulture[a.culture].parcelles.find(p=>p.id===a.parcelleId))
+      byCulture[a.culture].parcelles.push({id:a.parcelleId,nom:a.parcelleNom,debut:a.dateDebut,fin:a.dateFin});
+  });
+  const cultures=Object.keys(byCulture);
+  const totalHa=Object.values(byCulture).reduce((s,c)=>s+c.ha,0);
+  if(!cultures.length) return '';
+
+  // Camembert SVG
+  const pie=buildPieSVG(byCulture,totalHa,uid);
+
+  // Détail par culture avec menu déroulant parcelles
+  let detail='<div class="card" style="padding:8px 12px;margin-bottom:8px">';
+  cultures.forEach(c=>{
+    const col=cultureColor(c);
+    const pct=totalHa>0?(byCulture[c].ha/totalHa*100).toFixed(1):'0';
+    const duree=showDuree?`· <em>${dureeDepuis(byCulture[c].parcelles[0].debut,null)}</em>`:'';
+    const parcIds=byCulture[c].parcelles;
+    detail+=`<div style="padding:6px 0;border-bottom:0.5px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:10px;height:10px;border-radius:50%;background:${col};flex-shrink:0"></div>
+        <span style="flex:1;font-size:13px;font-weight:500">${c}</span>
+        <span style="font-size:12px;color:var(--text-muted)">${byCulture[c].ha.toFixed(1)} ha ${duree}</span>
+        <span style="font-size:12px;color:var(--text-faint);min-width:36px;text-align:right">${pct}%</span>
+      </div>
+      ${parcIds.length>0?`<details style="margin-top:4px;padding-left:18px">
+        <summary style="font-size:11px;color:var(--text-faint);cursor:pointer;list-style:none">
+          ▸ ${parcIds.length} parcelle${parcIds.length>1?'s':''}
+        </summary>
+        <div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:4px">
+          ${parcIds.map(p=>`<span class="p-badge" style="font-size:11px">📍 ${p.nom}</span>`).join('')}
+        </div>
+      </details>`:''}
+    </div>`;
+  });
+  detail+='</div>';
+  return pie+detail;
+}
+
+function buildPieSVG(byCulture,totalHa,uid){
+  if(totalHa<=0) return '';
+  const cultures=Object.keys(byCulture);
+  const W=280,H=280,cx=W/2,cy=H/2,R=90,RL=115;
+  let startAngle=-Math.PI/2;
+  let slices=[];
+  cultures.forEach(c=>{
+    const pct=byCulture[c].ha/totalHa;
+    const angle=pct*2*Math.PI;
+    slices.push({c,pct,startAngle,endAngle:startAngle+angle,color:cultureColor(c)});
+    startAngle+=angle;
+  });
+  let paths='',labels='';
+  slices.forEach(s=>{
+    const x1=cx+R*Math.cos(s.startAngle),y1=cy+R*Math.sin(s.startAngle);
+    const x2=cx+R*Math.cos(s.endAngle),y2=cy+R*Math.sin(s.endAngle);
+    const large=s.endAngle-s.startAngle>Math.PI?1:0;
+    const mid=(s.startAngle+s.endAngle)/2;
+    // Label extérieur
+    const lx=cx+RL*Math.cos(mid),ly=cy+RL*Math.sin(mid);
+    const tx=cx+(RL+20)*Math.cos(mid),ty=cy+(RL+20)*Math.sin(mid);
+    const anchor=tx>cx?'start':'end';
+    const shortName=s.c.length>14?s.c.substring(0,13)+'…':s.c;
+    paths+=`<path d="M${cx},${cy} L${x1},${y1} A${R},${R} 0 ${large},1 ${x2},${y2} Z"
+      fill="${s.color}" opacity="0.88" stroke="var(--surface)" stroke-width="1.5"/>`;
+    if(s.pct>0.04){
+      labels+=`<line x1="${lx}" y1="${ly}" x2="${tx}" y2="${ty}" stroke="${s.color}" stroke-width="1.2"/>
+      <text x="${tx+(anchor==='start'?3:-3)}" y="${ty}" font-size="9.5" fill="var(--text)"
+        text-anchor="${anchor}" dominant-baseline="middle" font-family="-apple-system,sans-serif">${shortName}</text>`;
+    }
+  });
+  return `<div class="pie-wrap">
+    <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="max-width:100%;overflow:visible">
+      ${paths}${labels}
+    </svg>
+  </div>`;
+}
+
+// ── PARAMÈTRES / TARIFS ─────────────────────────────────────────────────────
+function saveTarifs(){
+  tarifs.chauffeur=parseFloat(document.getElementById('cfg-chauffeur').value)||TARIFS_DEFAUT.chauffeur;
+  tarifs.tracteur=parseFloat(document.getElementById('cfg-tracteur').value)||TARIFS_DEFAUT.tracteur;
+  Object.keys(TYPES).forEach(t=>{
+    const el=document.getElementById('cfg-tm-'+t.replace(/\s|\//g,'_'));
+    if(el) tarifs.materiel[t]=parseFloat(el.value)||0;
+  });
+  saveTarifsLocal(); toast('✅ Tarifs sauvegardés');
+}
+function initParametres(){
+  document.getElementById('cfg-url').value=config.url||'';
+  document.getElementById('cfg-user').value=config.user||'';
+  document.getElementById('cfg-pass').value=config.pass||'';
+  document.getElementById('data-info').innerHTML=`${parcelles.length} parcelle${parcelles.length>1?'s':''} · ${interventions.length} intervention${interventions.length>1?'s':''} · ${bilans.length} bilan${bilans.length>1?'s':''} enregistré${bilans.length>1?'s':''}`;
+  document.getElementById('cfg-chauffeur').value=tarifs.chauffeur;
+  document.getElementById('cfg-tracteur').value=tarifs.tracteur;
+  const el=document.getElementById('cfg-tarifs-materiel');
+  el.innerHTML=Object.keys(TYPES).map(t=>`
+    <div class="tarif-row">
+      <label><span class="chip ${TYPE_CHIP[t]}" style="margin-right:4px">${TYPE_CODE[t]}</span> ${t}</label>
+      <input type="number" id="cfg-tm-${t.replace(/\s|\//g,'_')}" value="${tarifs.materiel[t]||0}" step="0.5" min="0" title="€/ha">
+    </div>`).join('');
+  updateSyncUI();
+}
+function updateSyncUI(){
+  const dot=document.getElementById('sync-dot');const lbl=document.getElementById('sync-label');
+  const status=document.getElementById('sync-status-display');if(!status)return;
+  if(!config.url){dot.className='sync-dot off';lbl.textContent='Kdrive';
+    status.innerHTML='<div class="sync-status-bar warning">⚙️ Synchronisation non configurée.</div>';}
+  else{dot.className='sync-dot';lbl.textContent='Sync ✓';
+    status.innerHTML='<div class="sync-status-bar">☁️ Kdrive configuré</div>';}
+}
+
+// ── WEBDAV / KDRIVE ─────────────────────────────────────────────────────────
+async function syncIfConfigured(){if(config.url&&config.user&&config.pass)await doSync();}
+async function testSync(){
+  if(!config.url||!config.user||!config.pass){toast('⚠️ Configurez d\'abord vos identifiants Kdrive');return;}
+  saveConfig();toast('🔄 Synchronisation en cours...',3000);document.getElementById('sync-dot').className='sync-dot syncing';
+  await doSync(true);
+}
+async function doSync(verbose=false){
+  const url=config.url.endsWith('/')?config.url:config.url+'/';
+  const fileUrl=url+'agrisuivi_data.json';
+  const headers={'Authorization':'Basic '+btoa(config.user+':'+config.pass),'Content-Type':'application/json'};
+
+  // Détection Electron : utiliser le proxy local pour contourner CORS
+  const PROXY='http://127.0.0.1:47821';
+  const isElectron=navigator.userAgent.includes('Electron');
+  function proxify(targetUrl, opts){
+    if(!isElectron) return fetch(targetUrl, opts);
+    const h={...opts.headers||{},'x-proxy-target':targetUrl};
+    return fetch(PROXY, {...opts, headers:h});
+  }
+
+  try{
+    let remoteData=null;
+    try{const resp=await proxify(fileUrl,{method:'GET',headers});if(resp.ok)remoteData=await resp.json();}catch(e){}
+    if(remoteData){
+      const localIds=new Set(interventions.map(i=>i.id));const localPIds=new Set(parcelles.map(p=>p.id));
+      const localBIds=new Set(bilans.map(b=>b.id));
+      const localAIds=new Set(assolement.map(a=>a.id));
+      const mi=[...interventions],mp=[...parcelles],mb=[...bilans],ma=[...assolement];
+      if(remoteData.interventions)remoteData.interventions.forEach(ri=>{if(!localIds.has(ri.id))mi.push(ri);});
+      if(remoteData.parcelles)remoteData.parcelles.forEach(rp=>{if(!localPIds.has(rp.id))mp.push(rp);});
+      if(remoteData.bilans)remoteData.bilans.forEach(rb=>{if(!localBIds.has(rb.id))mb.push(rb);});
+      if(remoteData.assolement)remoteData.assolement.forEach(ra=>{if(!localAIds.has(ra.id))ma.push(ra);});
+      interventions=mi.sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);parcelles=mp;
+      bilans=mb.sort((a,b)=>b.id-a.id);assolement=ma;
+      saveLocal();saveBilans();saveAssolementLocal();
+    }
+    const payload=JSON.stringify({version:'1.2',syncDate:new Date().toISOString(),parcelles,interventions,tarifs,bilans,assolement});
+    const putResp=await proxify(fileUrl,{method:'PUT',headers,body:payload});
+    if(putResp.ok||putResp.status===201||putResp.status===204){
+      document.getElementById('sync-dot').className='sync-dot';if(verbose)toast('☁️ Synchronisation Kdrive réussie !');renderDashboard();
+    }else{throw new Error('HTTP '+putResp.status);}
+  }catch(err){document.getElementById('sync-dot').className='sync-dot error';if(verbose)toast('❌ Erreur sync : '+err.message,4000);}
+}
+
+// ── PWA ─────────────────────────────────────────────────────────────────────
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;document.getElementById('install-banner').style.display='flex';});
+function installApp(){if(!deferredInstall)return;deferredInstall.prompt();deferredInstall.userChoice.then(()=>{document.getElementById('install-banner').style.display='none';deferredInstall=null;});}
+
+const swCode=`const CACHE='agrisuivi-v12';const ASSETS=['./'];self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>caches.match('./')))));`;
+if('serviceWorker' in navigator){const blob=new Blob([swCode],{type:'text/javascript'});navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});}
+// ── INIT ─────────────────────────────────────────────────────────────────────
+renderDashboard();initSaisie();
+</script>
+</body>
+</html>
